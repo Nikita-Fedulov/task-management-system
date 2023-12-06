@@ -5,12 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@NoArgsConstructor(force = true)
+@Table(name = "Tasks")
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,18 +22,27 @@ public class Task {
     @NotNull
     @Column(name = "description")
     private String description;
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private String status;
+    private TaskStatus  status;
     @Enumerated(EnumType.STRING)
     @Column(name = "priority")
-    private String priority;
+    private Priority priority;
 
-    @ManyToOne
-    @JoinColumn(name = "assignee_id")
-    private User assignee;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
+    private User user;
 
     @ElementCollection
     private List<String> comments;
+
+    public Task(String title, String description) {
+        this.title = title;
+        this.description = description;
+        this.status = TaskStatus.TODO;
+        this.priority = Priority.MEDIUM;
+        this.comments = new ArrayList<>();
+    }
 
 
 }

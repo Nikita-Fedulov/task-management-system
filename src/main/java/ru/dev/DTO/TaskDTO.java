@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.dev.model.Priority;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,4 +18,5 @@ public class TaskDTO {
     private Priority priority;
     private String authorName;
     private String assigneeName;
+    private List<String> comments;
 }
