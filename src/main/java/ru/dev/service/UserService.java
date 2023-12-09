@@ -1,15 +1,16 @@
 package ru.dev.service;
 
-import jakarta.persistence.EntityNotFoundException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.dev.DTO.UserDTO;
+import ru.dev.exception.NotFoundException;
 import ru.dev.model.User;
 import ru.dev.repository.UserRepository;
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
 
@@ -19,30 +20,43 @@ public class UserService {
 
     public User getUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
     }
 
-    public Long createUser(String username, String email, String password) {
+    public User createUser(UserDTO userDTO) {
         User user = User
                 .builder()
-                .username(username)
-                .email(email)
-                .password(password)
+                .username(userDTO.getUsername())
+                .email(userDTO.getEmail())
+                .password(userDTO.getPassword())
                 .build();
-        User savedUser = userRepository.save(user);
-        return savedUser.getId();
+        return userRepository.save(user);
     }
 
-    public void updateUser(Long userId, String newUsername, String newEmail, String newPassword) {
+    public User updateUser(Long userId, UserDTO updatedUserDTO) {
         User existingUser = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
 
-        existingUser.setUsername(newUsername);
-        existingUser.setEmail(newEmail);
-        existingUser.setPassword(newPassword);
+        if (existingUser != null) {
+            String updatedEmail = updatedUserDTO.getEmail();
+            if (updatedEmail != null && !updatedEmail.isBlank()) {
+                existingUser.setEmail(updatedEmail);
+            }
 
-        userRepository.save(existingUser);
+            String updatedPassword = updatedUserDTO.getPassword();
+            if (updatedPassword != null && !updatedPassword.isBlank()) {
+                existingUser.setPassword(updatedPassword);
+            }
+
+            return userRepository.save(existingUser);
+        }
+        return null;
     }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
 
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);

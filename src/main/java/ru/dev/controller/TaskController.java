@@ -1,50 +1,82 @@
 package ru.dev.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.dev.DTO.TaskDTO;
 import ru.dev.model.Task;
+import ru.dev.model.TaskStatus;
 import ru.dev.service.TaskService;
 
-import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/tasks")
+@Tag(name = "task management methods")
+@RequiredArgsConstructor
+@RequestMapping("/api/tasks")
+@Slf4j
 public class TaskController {
     private final TaskService taskService;
 
-    public TaskController(TaskService taskService) {
-        this.taskService = taskService;
-    }
 
     @GetMapping
     public ResponseEntity<List<Task>> getAllTasks() {
         List<Task> tasks = taskService.getAllTasks();
-        return ResponseEntity.ok(tasks);
+        return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
 
     @GetMapping("/{taskId}")
-    public ResponseEntity<Task> getTaskById(@PathVariable long taskId) {
+    @Operation(
+            summary = "Получение задачи по ее id",
+            description = "Обращение к БД и поиск задачи по id"
+    )
+    public ResponseEntity<Task> getTaskById(@PathVariable Long taskId) {
         Task task = taskService.getTaskById(taskId);
-        return ResponseEntity.ok(task);
+        return new ResponseEntity<>(task, HttpStatus.OK);
     }
-    @PostMapping(produces = "application/json")
-    public ResponseEntity<Long> createTask(@RequestBody @Valid Task task) {
-        long taskId = taskService.createTask(task.getTitle(), task.getDescription());
-        return ResponseEntity.ok(taskId);
+
+    @PostMapping
+    public ResponseEntity<Long> createTask(@RequestBody TaskDTO taskDTO) {
+        Long taskId = taskService.createTask(taskDTO);
+        return new ResponseEntity<>(taskId, HttpStatus.CREATED);
     }
 
     @PutMapping("/{taskId}")
-    public ResponseEntity<Void> updateTask(@PathVariable long taskId, @RequestBody @Valid Task task) {
-        taskService.updateTask(taskId, task.getTitle(), task.getDescription());
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Task> updateTask(@PathVariable Long taskId,
+                                           @RequestBody @Valid TaskDTO updatedTaskDTO) {
+        Task updatedTask = taskService.updateTask(taskId, updatedTaskDTO);
+        log.info("Amendment task: {}" , taskId);
+        return new ResponseEntity<>(updatedTask, HttpStatus.OK);
+    }
 
+    @PostMapping("/{taskId}/comments")
+    public ResponseEntity<Task> addComment(@PathVariable Long taskId, @RequestBody String commentText) {
+        Task task = taskService.addComment(taskId, commentText);
+        return new ResponseEntity<>(task, HttpStatus.OK);
+    }
+
+    @PutMapping("/{taskId}/status")
+    public ResponseEntity<Task> updateTaskStatus(@PathVariable Long taskId,
+                                                 @RequestBody @Valid TaskStatus newStatus) {
+        Task updatedTask = taskService.updateTaskStatus(taskId, newStatus);
+        return new ResponseEntity<>(updatedTask, HttpStatus.OK);
+    }
+
+    @PostMapping("/{taskId}/executor/{executorId}")
+    public ResponseEntity<Task> assignTaskExecutor(@PathVariable Long taskId, @PathVariable Long executorId) {
+        Task task = taskService.assignTaskExecutor(taskId, executorId);
+        return new ResponseEntity<>(task, HttpStatus.OK);
     }
 
     @DeleteMapping("/{taskId}")
-    public ResponseEntity<Void> deleteTask(@PathVariable long taskId) {
+    public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
         taskService.deleteTask(taskId);
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
 

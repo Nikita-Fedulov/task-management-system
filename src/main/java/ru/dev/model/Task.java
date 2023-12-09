@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -19,6 +20,7 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @NotNull
     @Column(name = "title")
     private String title;
     @NotNull
@@ -33,9 +35,19 @@ public class Task {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId")
-    private User user;
+    private User author;
+
+    @ManyToOne
+    @JoinColumn(name = "executor_id")
+    private User executor;
+
 
     @ElementCollection
-    private List<String> comments;
+    @CollectionTable(name = "task_comments", joinColumns = @JoinColumn(name = "task_id"))
+    private List<String> comments = new ArrayList<>();
+
+    @Column(name = "date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdDate;
 
 }
