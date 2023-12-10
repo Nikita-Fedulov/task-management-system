@@ -12,12 +12,10 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 
 @Service
 public class JwtService {
-    //TODO change + move to application props + .env file
     private static final String SECRET_KEY = "67556B586E3272357538782F413F4428472B4B6250655368566D597133733676";
     private static final Integer EXPIRATION_TIME_MILLS = 1000*60*24;
 

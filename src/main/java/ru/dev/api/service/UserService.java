@@ -9,12 +9,12 @@ import ru.dev.api.model.User;
 import ru.dev.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -26,12 +26,9 @@ public class UserService {
     }
 
     public User createUser(UserDTO userDTO) {
-        String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
-
         User user = User.builder()
                 .username(userDTO.getUsername())
-                .email(userDTO.getEmail())
-                .password(encodedPassword)
+                .password(userDTO.getPassword())
                 .build();
         return userRepository.save(user);
     }
@@ -41,9 +38,9 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
 
         if (existingUser != null) {
-            String updatedEmail = updatedUserDTO.getEmail();
-            if (updatedEmail != null && !updatedEmail.isBlank()) {
-                existingUser.setEmail(updatedEmail);
+            String updatedName = updatedUserDTO.getUsername();
+            if (updatedName != null && !updatedName.isBlank()) {
+                existingUser.setUsername(updatedName);
             }
 
             String updatedPassword = updatedUserDTO.getPassword();
@@ -56,8 +53,8 @@ public class UserService {
         return null;
     }
 
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public Optional<User> getUserByUsername(String usernsme) {
+        return userRepository.findByUsername(usernsme);
     }
 
 
