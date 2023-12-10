@@ -1,10 +1,11 @@
-package ru.dev.service;
+package ru.dev.api.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.dev.DTO.UserDTO;
-import ru.dev.exception.NotFoundException;
-import ru.dev.model.User;
+import ru.dev.api.DTO.UserDTO;
+import ru.dev.api.exception.NotFoundException;
+import ru.dev.api.model.User;
 import ru.dev.repository.UserRepository;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -24,11 +26,12 @@ public class UserService {
     }
 
     public User createUser(UserDTO userDTO) {
-        User user = User
-                .builder()
+        String encodedPassword = passwordEncoder.encode(userDTO.getPassword());
+
+        User user = User.builder()
                 .username(userDTO.getUsername())
                 .email(userDTO.getEmail())
-                .password(userDTO.getPassword())
+                .password(encodedPassword)
                 .build();
         return userRepository.save(user);
     }

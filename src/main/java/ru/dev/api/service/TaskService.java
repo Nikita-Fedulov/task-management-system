@@ -1,15 +1,15 @@
-package ru.dev.service;
+package ru.dev.api.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import ru.dev.DTO.TaskDTO;
-import ru.dev.model.Priority;
-import ru.dev.model.Task;
-import ru.dev.model.TaskStatus;
-import ru.dev.model.User;
+import ru.dev.api.DTO.TaskDTO;
+import ru.dev.api.model.Priority;
+import ru.dev.api.model.Task;
+import ru.dev.api.model.TaskStatus;
+import ru.dev.api.model.User;
 import ru.dev.repository.TaskRepository;
 import ru.dev.repository.UserRepository;
 
