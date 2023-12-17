@@ -25,14 +25,16 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Отключение CSRF
                 .authorizeHttpRequests(authorize -> {
-                    authorize.requestMatchers("/api/auth/**").permitAll();
+                    authorize.requestMatchers("/api/auth/**", "/swagger/**", "/webjars/**", "/swagger-ui*/**",
+                            "/swagger-ui.html", "/swagger-resources/**").permitAll();
                     authorize.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> {
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
                 })
                 .authenticationProvider(authenticationProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+        ;
 
         return http.build();
     }

@@ -1,28 +1,37 @@
 package ru.dev.configuration;
 
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-
+@OpenAPIDefinition
 @Configuration
+@SecurityScheme(
+        name = "Bearer Authentication",
+        type = SecuritySchemeType.HTTP,
+        bearerFormat = "JWT",
+        scheme = "bearer"
+)
 public class SwaggerConfig {
+    //todo вынести в config-файл
+    //http://localhost:8080/swagger-ui/index.html#/
+    private final String DOC_TITLE = "TaskManagementSystem api documentation";
+    private final String DOC_VERSION = "1.0.0";
+    private final String DOC_DESCRIPTION = "";
 
     @Bean
-    public OpenAPI openAPI(){
+    public OpenAPI baseOpenApi() {
         return new OpenAPI()
-                .servers(
-                        List.of(
-                                new Server().url("http://localhost:8080")
-                        )
-                )
                 .info(
-                        new Info().title("Task Management System API")
+                        new Info()
+                                .title(DOC_TITLE)
+                                .version(DOC_VERSION)
+                                .description(DOC_DESCRIPTION)
                 );
-
     }
 }
