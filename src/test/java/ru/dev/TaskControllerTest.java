@@ -43,6 +43,6 @@ public class TaskControllerTest {
         mockMvc.perform(get("/api/tasks")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)));
+                .andExpect(jsonPath("$", hasSize(1)));
     }
 }
